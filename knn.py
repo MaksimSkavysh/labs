@@ -1,4 +1,4 @@
-from math import exp
+import math
 import numpy as np
 
 
@@ -27,5 +27,53 @@ def get_data(address, shuffle=True):
     return s
 
 
-samples = get_data("./data/iris.data.txt")
-print(samples[0:10])
+def split_data(samples, rate=0.9):
+    train_num = int(len(samples)*rate)
+    return samples[:train_num], samples[train_num:]
+
+
+def get_class_counters(samples):
+    counters = {}
+    for s in samples:
+        if s[-1] in counters:
+            counters[s[-1]] += 1
+        else:
+            counters[s[-1]] = 1
+    return counters
+
+
+def euclidean_distance(x1, x2):
+    distance = 0
+    length = len(x1)
+    for i in range(0, length, 1):
+        distance += pow((x1[i] - x2[i]), 2)
+    return math.sqrt(distance)
+
+
+def get_neighbors(samples, test, k):
+    distances = []
+
+    for s in samples:
+        dist = euclidean_distance(test, s)
+        distances.append((s, dist))
+    print(distances)
+
+    # distances.sort()
+    neighbors = []
+    # for x in range(k):
+    #     neighbors.append(distances[x][0])
+    return neighbors
+
+
+def main():
+    samples = get_data("./data/iris.data.txt")
+    train, test = split_data(samples)
+
+    print('\nCounters:')
+    print(get_class_counters(train))
+    print(get_class_counters(test))
+    print('--------------------------------------------------------------------------------------------')
+
+    get_neighbors(samples[0:5], test[0], 2)
+
+main()
