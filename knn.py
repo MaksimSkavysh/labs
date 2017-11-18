@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def get_iris_class(name):
@@ -131,18 +132,26 @@ def main():
     print(get_class_counters(train))
     print('\nNumber of elements for each class (test data):')
     print(get_class_counters(test))
+    print('\n')
 
-    # neighbors = get_neighbors(train, test[0], 5)
-    # print(get_neighbors_class(neighbors))
-    # print(test[0][-1])
+    validation_results = []
+    for k in range(1, 50, 1):
+        error = run_cross_validation(samples, k, 15)
+        validation_results.append((k, error))
 
-    validation_resaults = []
-    for k in range(1, 20, 1):
-        error = run_cross_validation(samples, k)
-        validation_resaults.append((k, error))
+    plt.figure(0)
+    plt.plot([x[1]*100 for x in validation_results])
+    plt.ylabel('Percent of error')
+    plt.xlabel('k')
+    # plt.xticks(range(1, 51, 1))
 
-    validation_resaults.sort(key=lambda el: el[-1])
-    print(validation_resaults)
+    validation_results.sort(key=lambda el: el[-1])
 
+    best_k = validation_results[0][0]
+    print('\nBest k = ', best_k)
+    predict_list = predict(train, test, best_k)
+    errors = get_errors(test, predict_list)
+    print('\nPercent of error with the best k on test set : ', errors * 100, '%')
 
 main()
+plt.show()
