@@ -136,7 +136,13 @@ def main():
     # print(get_neighbors_class(neighbors))
     # print(test[0][-1])
 
-    for k in range(1, 111, 1):
-        run_cross_validation(samples, k)
+    validation_resaults = []
+    for k in range(1, 20, 1):
+        error = run_cross_validation(samples, k)
+        validation_resaults.append((k, error))
+
+    validation_resaults.sort(key=lambda el: el[-1])
+    print(validation_resaults)
+
 
 main()
