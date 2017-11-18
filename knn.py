@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 
-def getClass(name):
+def get_iris_class(name):
     if name == 'Iris-setosa':
         return 1.0
     elif name == 'Iris-versicolor':
@@ -20,7 +20,7 @@ def get_data(address, shuffle=True):
             parts = line.split(",")
             if len(parts) > 4:
                 last = parts[-1].strip()
-                parts[-1] = getClass(last)
+                parts[-1] = get_iris_class(last)
                 s.append([float(x) for x in parts])
     if shuffle:
         np.random.shuffle(s)
@@ -42,6 +42,17 @@ def get_class_counters(samples):
     return counters
 
 
+def get_neighbors_class(neighbors):
+    counters = get_class_counters(neighbors)
+    max_value = 0
+    cur_key = None
+    for key, value in counters.items():
+        if value > max_value:
+            max_value = value
+            cur_key = key
+    return cur_key
+
+
 def euclidean_distance(x1, x2):
     distance = 0
     length = len(x1)
@@ -57,51 +68,75 @@ def get_neighbors(samples, test, k):
     distances = []
 
     for s in samples:
-        dist = euclidean_distance(test, s)
-        distances.append((s[-1], dist))
-    distances.sort(key=lambda el: el[-1])
+        dist = euclidean_distance(test[:-1], s[:-1])
+        distances.append((dist, s[-1]))
+    distances.sort(key=lambda el: el[0])
     neighbors = []
     for x in range(k):
         neighbors.append(distances[x])
     return neighbors
 
 
-def cross_validation_split(dataset, n_folds):
+def cross_validation_split(data, n_folds):
     folds_data = list()
-    fold_length = math.ceil(len(dataset)/n_folds)
+    fold_length = math.ceil(len(data)/n_folds)
     for i in range(0, n_folds):
-        folds_data.append(dataset[fold_length*i: fold_length*(i + 1)])
+        folds_data.append(data[fold_length*i: fold_length*(i + 1)])
     return folds_data
+
+
+def split_fold_data(folds, i):
+    test_fold = folds[i]
+    train_fold = []
+    for j in range(0, len(folds)):
+        if i != j:
+            train_fold = train_fold + folds[j]
+    return train_fold, test_fold
+
+
+def predict(train_fold, test_fold, k):
+    predict_list = []
+    for t in test_fold:
+        neighbors = get_neighbors(train_fold, t, k)
+        predict_list.append(get_neighbors_class(neighbors))
+    return predict_list
+
+
+def get_errors(test, predict):
+    errors = 0.0
+    for i in range(0, len(test)):
+        if test[i][-1] != predict[i]:
+            errors += 1.0
+    return errors
 
 
 def run_cross_validation(samples, k, n_folds=10):
     folds = cross_validation_split(samples, n_folds)
-
     accuracy = 0
-
     for i in range(0, len(folds)):
-        test_fold = folds[i]
-        train_x = []
-        for j in range(0, len(folds)):
-            if i != j:
-                train_x = train_x + folds[j]
-        accuracy = accuracy + 0
+        train_fold, test_fold = split_fold_data(folds, i)
+        predict_list = predict(train_fold, test_fold, k)
+        errors = get_errors(test_fold, predict_list)
+        accuracy = accuracy + errors/len(test_fold)
     accuracy = accuracy/n_folds
-    return accuracy, 0
+    print('Percent of errors with k=', str(k), ' : ', accuracy * 100, '%')
+    return accuracy
 
 
 def main():
     samples = get_data("./data/iris.data.txt")
     train, test = split_data(samples)
 
-    print('\nCounters:')
+    print('\nNumber of elements for each class (train data):')
     print(get_class_counters(train))
+    print('\nNumber of elements for each class (test data):')
     print(get_class_counters(test))
-    print('-------------------------------------------------------------------------------------------\n')
 
-    print(get_neighbors(train, test[0], 2))
-    print(test[0])
+    # neighbors = get_neighbors(train, test[0], 5)
+    # print(get_neighbors_class(neighbors))
+    # print(test[0][-1])
 
-    run_cross_validation(samples, 1)
+    for k in range(1, 111, 1):
+        run_cross_validation(samples, k)
 
 main()
