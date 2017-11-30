@@ -1,12 +1,13 @@
 import random
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_mldata
 import numpy as np
 import sklearn
 import sklearn.linear_model
 import sklearn.svm
 import sklearn.ensemble
 import sklearn.naive_bayes
-from sklearn.datasets import fetch_mldata
-import matplotlib.pyplot as plt
+import sklearn.svm
 
 def counter_generator(init_value=0):
     counter = [init_value]
@@ -133,11 +134,45 @@ def train_naive_bayes(X_train, Y_train, X_dev, Y_dev):
         print("Dev score {:.2f}".format(estimator.score(X_dev, Y_dev)))
 
 
-# train_random_forest(range(10, 300, 10), x_train, y_train, x_dev, y_dev)
+def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev):
+    train_scores = []
+    dev_scores = []
+    figure_num = counter()
+
+    for degree in degrees:
+        estimator = sklearn.svm.SVC(
+            kernel='poly',  # 'linear', 'poly', 'rbf', 'sigmoid', 'precomputed'
+            degree=degree,
+            # coef0=0.0,  # Independent term in kernel function. It is only significant in 'poly' and 'sigmoid'.
+            # shrinking=True,
+            # verbose=False,
+            # max_iter=-1,
+            # decision_function_shape='ovr',  # 'ovo', 'ovr',
+        )
+        estimator.fit(X_train, Y_train)
+        train_scores.append(estimator.score(X_train, Y_train))
+        dev_score = estimator.score(X_dev, Y_dev)
+        print(dev_score)
+        dev_scores.append(dev_score)
+
+    plot_one_param(
+        params=degrees,
+        train_scores=train_scores,
+        dev_scores=dev_scores,
+        title='SVC accuracy',
+        param_name='kernel degree',
+        figure_num=figure_num,
+    )
+
+
+
+# train_random_forest(range(50, 150, 10), x_train, y_train, x_dev, y_dev)
 
 # train_logistic_regression(x_train, y_train, x_dev, y_dev)
 
-train_naive_bayes(x_train, y_train, x_dev, y_dev)
+# train_naive_bayes(x_train, y_train, x_dev, y_dev)
 
-# help(sklearn.naive_bayes.BernoulliNB)
+train_SVC(range(1, 10), x_train, y_train, x_dev, y_dev)
+
+# help(sklearn.svm.SVC)
 plt.show()
