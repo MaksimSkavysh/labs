@@ -165,7 +165,6 @@ def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev):
     )
 
 
-
 # train_random_forest(range(50, 150, 10), x_train, y_train, x_dev, y_dev)
 
 # train_logistic_regression(x_train, y_train, x_dev, y_dev)
