@@ -117,10 +117,9 @@ def train_random_forest(n_estimators, X_train, Y_train, X_dev, Y_dev):
     return train_scores, dev_scores
 
 
-
-
 # train_random_forest(range(10, 300, 10), x_train, y_train, x_dev, y_dev)
-train_logistic_regression(x_train, y_train, x_dev, y_dev)
+
+# train_logistic_regression(x_train, y_train, x_dev, y_dev)
 
 
 # help(sklearn.linear_model.LogisticRegression)
