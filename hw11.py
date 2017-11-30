@@ -7,13 +7,6 @@ import sklearn.ensemble
 from sklearn.datasets import fetch_mldata
 import matplotlib.pyplot as plt
 
-
-def plot_distribution(x, num, name='distribution'):
-    plt.figure(num)
-    plt.hist(x)
-    plt.title(name)
-
-
 def counter_generator(init_value=0):
     counter = [init_value]
 
@@ -22,15 +15,13 @@ def counter_generator(init_value=0):
         return counter[0]
     return inner
 
+counter = counter_generator()
 
-def get_class_counters(samples):
-    counters = {}
-    for s in samples:
-        if s[-1] in counters:
-            counters[s[-1]] += 1
-        else:
-            counters[s[-1]] = 1
-    return counters
+
+def plot_distribution(x, num, name='distribution'):
+    plt.figure(num)
+    plt.hist(x)
+    plt.title(name)
 
 
 def visualize(x, title=None):
@@ -53,7 +44,18 @@ def get_data(home):
     return X, Y
 
 
-counter = counter_generator()
+def plot_one_param(params, train_scores, dev_scores, title, param_name):
+    # plt.figure(counter(), figsize=(12, 12))
+    plt.figure(counter())
+    plt.plot(params, train_scores, label='train accuracy')
+    plt.plot(params, dev_scores, label='dev accuracy')
+    plt.title(title)
+    plt.xlabel(param_name)
+    plt.ylabel('accuracy')
+    plt.legend()
+    plt.show()
+
+
 ntrain_dev = 60000
 
 X, Y = get_data('./mnist')
@@ -76,14 +78,6 @@ plot_distribution(y_train, counter(), 'y_train distribution')
 x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 1000)
 plot_distribution(y_dev, counter(), 'y_dev distribution')
 
-# x_test, y_test = filter_by_digits(X_test, Y_test, cool_digits, 100)
-# plot_distribution(y_test, counter(), 'y_test distribution')
-
-
-# plt.figure(counter())
-# num = random.randint(0, len(x_train) - 1)
-# visualize(x_train[num], title='This is {}'.format(y_train[num]))
-
 
 # Logistic regression
 # logistic_regression = sklearn.linear_model.LogisticRegression()
@@ -93,16 +87,6 @@ plot_distribution(y_dev, counter(), 'y_dev distribution')
 
 
 # Random forest
-def plot_one_param(params, train_scores, dev_scores, title, param_name):
-    # plt.figure(counter(), figsize=(12, 12))
-    plt.figure(counter())
-    plt.plot(params, train_scores, label='train accuracy')
-    plt.plot(params, dev_scores, label='dev accuracy')
-    plt.title(title)
-    plt.xlabel(param_name)
-    plt.ylabel('accuracy')
-    plt.legend()
-    plt.show()
 
 
 def train_random_forest(n_estimators, X_train, Y_train, X_dev, Y_dev):
