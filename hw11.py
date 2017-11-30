@@ -4,6 +4,7 @@ import sklearn
 import sklearn.linear_model
 import sklearn.svm
 import sklearn.ensemble
+import sklearn.naive_bayes
 from sklearn.datasets import fetch_mldata
 import matplotlib.pyplot as plt
 
@@ -117,10 +118,26 @@ def train_random_forest(n_estimators, X_train, Y_train, X_dev, Y_dev):
     return train_scores, dev_scores
 
 
+def train_naive_bayes(X_train, Y_train, X_dev, Y_dev):
+    naive_bayes_estimators = [
+        sklearn.naive_bayes.BernoulliNB,
+        sklearn.naive_bayes.GaussianNB,
+        sklearn.naive_bayes.MultinomialNB
+    ]
+
+    for estimator_class in naive_bayes_estimators:
+        print("Using", estimator_class)
+        estimator = estimator_class()
+        estimator.fit(X_train, Y_train)
+        print("Train score {:.2f}".format(estimator.score(x_train, y_train)))
+        print("Dev score {:.2f}".format(estimator.score(X_dev, Y_dev)))
+
+
 # train_random_forest(range(10, 300, 10), x_train, y_train, x_dev, y_dev)
 
 # train_logistic_regression(x_train, y_train, x_dev, y_dev)
 
+train_naive_bayes(x_train, y_train, x_dev, y_dev)
 
-# help(sklearn.linear_model.LogisticRegression)
+# help(sklearn.naive_bayes.BernoulliNB)
 plt.show()
