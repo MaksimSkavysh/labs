@@ -9,6 +9,13 @@ import sklearn.ensemble
 import sklearn.naive_bayes
 import sklearn.svm
 
+
+def frange(x, y, jump):
+  while x < y:
+    yield x
+    x += jump
+
+
 def counter_generator(init_value=0):
     counter = [init_value]
 
@@ -55,7 +62,7 @@ def plot_one_param(params, train_scores, dev_scores, title, param_name, figure_n
     plt.xlabel(param_name)
     plt.ylabel('accuracy')
     plt.legend()
-    plt.show()
+    # plt.show()
 
 
 ntrain_dev = 60000
@@ -134,7 +141,7 @@ def train_naive_bayes(X_train, Y_train, X_dev, Y_dev):
         print("Dev score {:.2f}".format(estimator.score(X_dev, Y_dev)))
 
 
-def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev):
+def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev, coef=0.0, decision_function_shape='ovr'):
     train_scores = []
     dev_scores = []
     figure_num = counter()
@@ -143,16 +150,16 @@ def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev):
         estimator = sklearn.svm.SVC(
             kernel='poly',  # 'linear', 'poly', 'rbf', 'sigmoid', 'precomputed'
             degree=degree,
-            # coef0=0.0,  # Independent term in kernel function. It is only significant in 'poly' and 'sigmoid'.
+            coef0=coef,  # Independent term in kernel function. It is only significant in 'poly' and 'sigmoid'.
             # shrinking=True,
             # verbose=False,
             # max_iter=-1,
-            # decision_function_shape='ovr',  # 'ovo', 'ovr',
+            decision_function_shape=decision_function_shape,  # 'ovo', 'ovr',
         )
         estimator.fit(X_train, Y_train)
         train_scores.append(estimator.score(X_train, Y_train))
         dev_score = estimator.score(X_dev, Y_dev)
-        print(dev_score)
+        print(degree, dev_score)
         dev_scores.append(dev_score)
 
     plot_one_param(
@@ -171,7 +178,7 @@ def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev):
 
 # train_naive_bayes(x_train, y_train, x_dev, y_dev)
 
-train_SVC(range(1, 10), x_train, y_train, x_dev, y_dev)
+train_SVC(range(1, 5), x_train, y_train, x_dev, y_dev)
 
 # help(sklearn.svm.SVC)
-plt.show()
+# plt.show()
