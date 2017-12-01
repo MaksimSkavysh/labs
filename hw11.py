@@ -8,6 +8,7 @@ import sklearn.svm
 import sklearn.ensemble
 import sklearn.naive_bayes
 import sklearn.svm
+import sklearn.neighbors
 
 
 def frange(x, y, jump):
@@ -81,10 +82,10 @@ y_dev = Y_train_dev[permutation][ntrain:]
 
 
 cool_digits = [0, 1, 2, 3, 4]
-x_train, y_train = filter_by_digits(x_train, y_train, cool_digits, 3000)
+x_train, y_train = filter_by_digits(x_train, y_train, cool_digits, 10000)
 plot_distribution(y_train, counter(), 'y_train distribution')
 
-x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 300)
+x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 1000)
 plot_distribution(y_dev, counter(), 'y_dev distribution')
 
 
@@ -172,13 +173,44 @@ def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev, coef=0.0, decision_functi
     )
 
 
+def train_KNN(neighbors_range, X_train, Y_train, X_dev, Y_dev):
+    print('\ntrain_KNN\n')
+    train_scores = []
+    dev_scores = []
+    figure_num = counter()
+
+    for n_neighbors in neighbors_range:
+        estimator = sklearn.neighbors.KNeighborsClassifier(
+            n_neighbors=n_neighbors,
+            weights='uniform',  # 'uniform' 'distance'
+            leaf_size=30,
+            n_jobs=-1,
+        )
+        estimator.fit(X_train, Y_train)
+        train_scores.append(estimator.score(X_train, Y_train))
+        dev_score = estimator.score(X_dev, Y_dev)
+        print(n_neighbors, dev_score)
+        dev_scores.append(dev_score)
+
+    plot_one_param(
+        params=neighbors_range,
+        train_scores=train_scores,
+        dev_scores=dev_scores,
+        title='SVC accuracy',
+        param_name='kernel degree',
+        figure_num=figure_num,
+    )
+
 # train_random_forest(range(50, 150, 10), x_train, y_train, x_dev, y_dev)
 
 # train_logistic_regression(x_train, y_train, x_dev, y_dev)
 
 # train_naive_bayes(x_train, y_train, x_dev, y_dev)
 
-train_SVC(range(1, 5), x_train, y_train, x_dev, y_dev)
+# train_SVC(range(1, 5), x_train, y_train, x_dev, y_dev)
 
-# help(sklearn.svm.SVC)
-# plt.show()
+train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev)
+
+
+# help(sklearn.neighbors.KNeighborsClassifier)
+plt.show()
