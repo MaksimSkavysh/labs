@@ -88,6 +88,8 @@ plot_distribution(y_train, counter(), 'y_train distribution')
 x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 4000)
 plot_distribution(y_dev, counter(), 'y_dev distribution')
 
+# x_train, y_train = X_train_dev, Y_train_dev
+# x_dev, y_dev = X_test, Y_test
 
 # Logistic regression
 def train_logistic_regression(X_train, Y_train, X_dev, Y_dev):
@@ -209,7 +211,7 @@ def train_KNN(
         figure_num=figure_num,
     )
 
-# train_random_forest(range(50, 150, 10), x_train, y_train, x_dev, y_dev)
+train_random_forest(range(50, 150, 10), x_train, y_train, x_dev, y_dev)
 
 # train_logistic_regression(x_train, y_train, x_dev, y_dev)
 
@@ -217,10 +219,12 @@ def train_KNN(
 
 # train_SVC(range(1, 5), x_train, y_train, x_dev, y_dev)
 
-train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='uniform')
-print('distance')
-train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='distance')
+# train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='uniform')
+# print('distance')
+# train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='distance')
 
 
 # help(sklearn.neighbors.KNeighborsClassifier)
 plt.show()
+
+
