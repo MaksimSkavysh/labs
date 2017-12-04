@@ -81,11 +81,11 @@ x_dev = X_train_dev[permutation][ntrain:]
 y_dev = Y_train_dev[permutation][ntrain:]
 
 
-cool_digits = [0, 1, 2, 3, 4]
-x_train, y_train = filter_by_digits(x_train, y_train, cool_digits, 10000)
+cool_digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+x_train, y_train = filter_by_digits(x_train, y_train, cool_digits, 20000)
 plot_distribution(y_train, counter(), 'y_train distribution')
 
-x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 1000)
+x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 4000)
 plot_distribution(y_dev, counter(), 'y_dev distribution')
 
 
@@ -173,16 +173,24 @@ def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev, coef=0.0, decision_functi
     )
 
 
-def train_KNN(neighbors_range, X_train, Y_train, X_dev, Y_dev):
+def train_KNN(
+        neighbors_range,
+        X_train,
+        Y_train,
+        X_dev,
+        Y_dev,
+        weights='uniform'
+):
     print('\ntrain_KNN\n')
     train_scores = []
     dev_scores = []
     figure_num = counter()
 
     for n_neighbors in neighbors_range:
+        print(n_neighbors)
         estimator = sklearn.neighbors.KNeighborsClassifier(
             n_neighbors=n_neighbors,
-            weights='uniform',  # 'uniform' 'distance'
+            weights=weights,  # 'uniform' 'distance'
             leaf_size=30,
             n_jobs=-1,
         )
@@ -209,7 +217,9 @@ def train_KNN(neighbors_range, X_train, Y_train, X_dev, Y_dev):
 
 # train_SVC(range(1, 5), x_train, y_train, x_dev, y_dev)
 
-train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev)
+train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='uniform')
+print('distance')
+train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='distance')
 
 
 # help(sklearn.neighbors.KNeighborsClassifier)
