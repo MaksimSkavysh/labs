@@ -10,4 +10,12 @@ import sklearn.naive_bayes
 import sklearn.svm
 import sklearn.neighbors
 
-help(sklearn.neighbors.KNeighborsClassifier)
+
+def s(a=0, b=1):
+    return a+b
+
+o = {'a': 2, 'b': 3}
+
+print(s(**o))
+
+# help(sklearn.neighbors.KNeighborsClassifier)

@@ -82,7 +82,7 @@ y_dev = Y_train_dev[permutation][ntrain:]
 
 
 cool_digits = [0, 1, 2, 3, 4]
-x_train, y_train = filter_by_digits(x_train, y_train, cool_digits, 5000)
+x_train, y_train = filter_by_digits(x_train, y_train, cool_digits, 10000)
 plot_distribution(y_train, counter(), 'y_train distribution')
 
 x_dev, y_dev = filter_by_digits(x_dev, y_dev, cool_digits, 1000)
@@ -90,7 +90,6 @@ plot_distribution(y_dev, counter(), 'y_dev distribution')
 
 # x_train, y_train = X_train_dev, Y_train_dev
 # x_dev, y_dev = X_test, Y_test
-
 
 # Logistic regression
 def train_logistic_regression(X_train, Y_train, X_dev, Y_dev):
@@ -105,6 +104,29 @@ def train_logistic_regression(X_train, Y_train, X_dev, Y_dev):
     logistic_regression.fit(X_train, Y_train)
     print('logistic_regression on train', logistic_regression.score(X_train, Y_train))
     print('logistic_regression on dev', logistic_regression.score(X_dev, Y_dev))
+
+
+# Random forest
+def train_random_forest(n_estimators, X_train, Y_train, X_dev, Y_dev):
+    train_scores = []
+    dev_scores = []
+    figure_num = counter()
+
+    for estimators in n_estimators:
+        clf = sklearn.ensemble.RandomForestClassifier(n_estimators=estimators, n_jobs=-1)
+        clf.fit(X_train, Y_train)
+        train_scores.append(clf.score(X_train, Y_train))
+        dev_scores.append(clf.score(X_dev, Y_dev))
+
+    plot_one_param(
+        params=n_estimators,
+        train_scores=train_scores,
+        dev_scores=dev_scores,
+        title='Random forest accuracy',
+        param_name='number of trees',
+        figure_num=figure_num,
+    )
+    return train_scores, dev_scores
 
 
 def train_naive_bayes(X_train, Y_train, X_dev, Y_dev):
@@ -122,6 +144,74 @@ def train_naive_bayes(X_train, Y_train, X_dev, Y_dev):
         print("Dev score {:.2f}".format(estimator.score(X_dev, Y_dev)))
 
 
+def train_SVC(degrees, X_train, Y_train, X_dev, Y_dev, coef=0.0, decision_function_shape='ovr'):
+    train_scores = []
+    dev_scores = []
+    figure_num = counter()
+
+    for degree in degrees:
+        estimator = sklearn.svm.SVC(
+            kernel='poly',  # 'linear', 'poly', 'rbf', 'sigmoid', 'precomputed'
+            degree=degree,
+            coef0=coef,  # Independent term in kernel function. It is only significant in 'poly' and 'sigmoid'.
+            # shrinking=True,
+            # verbose=False,
+            # max_iter=-1,
+            decision_function_shape=decision_function_shape,  # 'ovo', 'ovr',
+        )
+        estimator.fit(X_train, Y_train)
+        train_scores.append(estimator.score(X_train, Y_train))
+        dev_score = estimator.score(X_dev, Y_dev)
+        print(degree, dev_score)
+        dev_scores.append(dev_score)
+
+    plot_one_param(
+        params=degrees,
+        train_scores=train_scores,
+        dev_scores=dev_scores,
+        title='SVC accuracy',
+        param_name='kernel degree',
+        figure_num=figure_num,
+    )
+
+
+def train_KNN(
+        neighbors_range,
+        X_train,
+        Y_train,
+        X_dev,
+        Y_dev,
+        weights='uniform'
+):
+    print('\ntrain_KNN\n')
+    train_scores = []
+    dev_scores = []
+    figure_num = counter()
+
+    for n_neighbors in neighbors_range:
+        print(n_neighbors)
+        estimator = sklearn.neighbors.KNeighborsClassifier(
+            n_neighbors=n_neighbors,
+            weights=weights,  # 'uniform' 'distance'
+            leaf_size=30,
+            n_jobs=-1,
+        )
+        estimator.fit(X_train, Y_train)
+        train_scores.append(estimator.score(X_train, Y_train))
+        dev_score = estimator.score(X_dev, Y_dev)
+        print(n_neighbors, dev_score)
+        dev_scores.append(dev_score)
+
+    plot_one_param(
+        params=neighbors_range,
+        train_scores=train_scores,
+        dev_scores=dev_scores,
+        title='SVC accuracy',
+        param_name='kernel degree',
+        figure_num=figure_num,
+    )
+
+
 def train_model_with_params(model,
                             model_name,
                             params,
@@ -130,7 +220,7 @@ def train_model_with_params(model,
                             test_samples,
                             test_labels,
                             ):
-    print('\n' + model_name + ':')
+    print('\n' + model_name + ':\n')
     train_scores = []
     dev_scores = []
     figure_num = counter()
@@ -152,48 +242,12 @@ def train_model_with_params(model,
         figure_num=figure_num,
     )
 
+train_random_forest(range(50, 150, 20), x_train, y_train, x_dev, y_dev)
 
-# # Random Forest Classifier
-# train_model_with_params(
-#     model=lambda p: sklearn.ensemble.RandomForestClassifier(n_estimators=p, n_jobs=-1),
-#     model_name='RandomForestClassifier',
-#     params=range(50, 150, 20),
-#     train_samples=x_train,
-#     train_labels=y_train,
-#     test_samples=x_dev,
-#     test_labels=y_dev,
-# )
-
-# # SVC
-# train_model_with_params(
-#     model=lambda p: sklearn.svm.SVC(
-#             kernel='poly',  # 'linear', 'poly', 'rbf', 'sigmoid', 'precomputed'
-#             degree=p,
-#             coef0=0.0,  # Independent term in kernel function. It is only significant in 'poly' and 'sigmoid'.
-#             # shrinking=True,
-#             # verbose=False,
-#             # max_iter=-1,
-#             decision_function_shape='ovr',  # 'ovo', 'ovr',
-#         ),
-#     model_name='SVC',
-#     params=range(2, 4),
-#     train_samples=x_train,
-#     train_labels=y_train,
-#     test_samples=x_dev,
-#     test_labels=y_dev,
-# )
-
-# KNN
-knn_model = lambda p: sklearn.neighbors.KNeighborsClassifier(
-                n_neighbors=p,
-                weights='uniform',  # 'uniform' 'distance'
-                leaf_size=30,
-                n_jobs=-1,
-            )
 train_model_with_params(
-    model=knn_model,
-    model_name='KNN',
-    params=range(2, 4),
+    model=lambda p: sklearn.ensemble.RandomForestClassifier(n_estimators=p, n_jobs=-1),
+    model_name='RandomForestClassifier',
+    params=range(50, 150, 20),
     train_samples=x_train,
     train_labels=y_train,
     test_samples=x_dev,
@@ -203,6 +257,12 @@ train_model_with_params(
 # train_logistic_regression(x_train, y_train, x_dev, y_dev)
 
 # train_naive_bayes(x_train, y_train, x_dev, y_dev)
+
+# train_SVC(range(1, 5), x_train, y_train, x_dev, y_dev)
+
+# train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='uniform')
+# print('distance')
+# train_KNN(range(2, 4), x_train, y_train, x_dev, y_dev, weights='distance')
 
 # help(sklearn.neighbors.KNeighborsClassifier)
 
