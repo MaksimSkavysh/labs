@@ -193,7 +193,7 @@ knn_model = lambda p: sklearn.neighbors.KNeighborsClassifier(
 train_model_with_params(
     model=knn_model,
     model_name='KNN',
-    params=range(2, 4),
+    params=range(1, 9),
     train_samples=x_train,
     train_labels=y_train,
     test_samples=x_dev,
