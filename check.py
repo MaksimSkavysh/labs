@@ -11,11 +11,9 @@ import sklearn.svm
 import sklearn.neighbors
 
 
-def s(a=0, b=1):
-    return a+b
+arr = [1, 2, 3, 4, 6, 7]
 
-o = {'a': 2, 'b': 3}
+np.random.shuffle(arr)
 
-print(s(**o))
-
+print(arr)
 # help(sklearn.neighbors.KNeighborsClassifier)
