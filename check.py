@@ -17,6 +17,6 @@ np.random.shuffle(arr)
 
 clf = sklearn.ensemble.RandomForestClassifier(n_estimators=2, n_jobs=-1)
 
-print(clf)
+print([1, 2] + [4, 5])
 
 # help(sklearn.neighbors.KNeighborsClassifier)
