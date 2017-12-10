@@ -3,6 +3,9 @@ import numpy as np
 from sklearn.datasets import fetch_mldata
 
 
+MNIST_WATERLINE = 60000
+
+
 def frange(x, y, jump):
   while x < y:
     yield x
@@ -37,15 +40,39 @@ def filter_by_digits(x, y, digits, limit=None):
     return x[indices][:limit], y[indices][:limit]
 
 
-class DataManager:
+class MinstDataManager:
     def __init__(self):
-        self.x_mnist = []
-        self.y_mnist = []
+        # Original data
+        # self.x_mnist = []
+        # self.y_mnist = []
 
-    def get_mnist_data(self, path='./mnist'):
+        # Original data splited on test/train
+        self.x_tr_mnist = []
+        self.y_tr_mnist = []
+        self.x_test_mnist = []
+        self.y_test_mnist = []
+
+        # Original train data splited on test/train
+        self.x_train = []
+        self.y_train = []
+        self.x_test = []
+        self.y_test = []
+
+    def prepare_mnist_data(self, path='./mnist', n_train=int(MNIST_WATERLINE * 90 / 100)):
         x_mnist, y_mnist = get_data(path)
-        self.x_mnist = x_mnist
-        self.y_mnist = y_mnist
+        # self.x_mnist = x_mnist
+        # self.y_mnist = y_mnist
+        self.x_tr_mnist, \
+            self.y_tr_mnist, \
+            self.x_test_mnist, \
+            self.y_test_mnist = split_data(x_mnist, y_mnist, MNIST_WATERLINE)
+
+        permutation = np.random.permutation(MNIST_WATERLINE)
+
+        self.x_train, \
+            self.y_train, \
+            self.x_test, \
+            self.y_test = split_data(self.x_tr_mnist[permutation], self.y_tr_mnist[permutation], n_train)
 
 
 
@@ -84,6 +111,10 @@ class Grapher:
         plt.ylabel('accuracy')
         plt.legend()
         # plt.show()
+
+    @staticmethod
+    def show():
+        plt.show()
 
 
 
