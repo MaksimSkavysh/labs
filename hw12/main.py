@@ -1,77 +1,62 @@
 import random
 from math import exp
 import numpy as np
+from sklearn import datasets
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
-currentIris = 'Iris-setosa'
+# currentIris = 'Iris-setosa'
+#
+# def get_data(address):
+#     samples = []
+#     labels = []
+#     with open(address) as file:
+#         for line in file:
+#             parts = line.split(",")
+#             last = parts[-1]
+#             samples.append([float(x) for x in parts[0:-1]])
+#             if last.strip() == currentIris:
+#                 labels.append(1)
+#             else:
+#                 labels.append(0)
+#     permutation = np.random.permutation(len(samples))
+#     # return samples[permutation], labels[permutation]
+#     return samples, labels
+#
+#
+# def split_data(samples, labels, waterline=60000):
+#     train_samples, train_labels = samples[:waterline], labels[:waterline]
+#     test_samples, test_labels = samples[waterline:], labels[waterline:]
+#     return train_samples, train_labels, test_samples, test_labels
+#
+#
+# samples, labels = get_data("./data/iris.data.txt")
+# print(samples[0])
 
+iris = datasets.load_iris()
+target_names = iris.target_names
 
-def get_data(address):
-    samples = []
-    labels = []
-    with open(address) as file:
-        for line in file:
-            parts = line.split(",")
-            last = parts[-1]
-            samples.append([float(x) for x in parts[0:-1]])
-            if last.strip() == currentIris:
-                labels.append(1)
-            else:
-                labels.append(0)
-    return samples, labels
+X = iris.data
+y = iris.target
 
+pca = PCA(n_components=2)
+X_r = pca.fit(X).transform(X)
 
-def split_data(samples, labels, percent=0.9):
-    indexes = [i for i in range(0, len(samples), 1)]
-    random.shuffle(indexes)
-    train_part = int(len(samples)*percent)
-    train_samples = []
-    train_labels = []
-    test_samples = []
-    test_labels = []
-    for i in indexes[0:train_part]:
-        train_samples.append(samples[i])
-        train_labels.append(labels[i])
-    for i in indexes[train_part:]:
-        test_samples.append(samples[i])
-        test_labels.append(labels[i])
-    return train_samples, train_labels, test_samples, test_labels, indexes
+# help(pca.fit(X).transform)
 
-
-def predict(row, coefficients):
-    label = coefficients[0]
-    for i in range(len(row)-1):
-        label += coefficients[i + 1] * row[i]
-    return label
-
-
-def sigma(x):
-    return 1/(1+exp(-x))
-
-
-def coefficients_sgd(samples, eta, T):
-    w = [0.0]*4
-    m = len(samples)
-    for t in range(0, T, 1):
-        for sample in samples:
-            error = predict(sample, w) - sample[-1]
-            w[0] = w[0] - (1/m) * eta * error
-            for i in range(len(sample)-1):
-                w[i + 1] = w[i + 1] - (1/m) * eta * error * sample[i]
-    return w
+# Percentage of variance explained for each components
+print('explained variance ratio (first two components): %s'
+      % str(pca.explained_variance_ratio_))
 
 
+plt.figure()
+colors = ['navy', 'turquoise', 'darkorange']
+lw = 2
 
-samples, labels = get_data("./data/iris.data.txt")
-tr_s, tr_l, test_s, test_l, indexes = split_data(samples, labels)
+for color, i, target_name in zip(colors, [0, 1, 2], target_names):
+    plt.scatter(X_r[y == i, 0], X_r[y == i, 1], color=color, alpha=.8, lw=lw,
+                label=target_name)
+plt.legend(loc='best', shadow=False, scatterpoints=1)
+plt.title('PCA of IRIS dataset')
 
-
-# eta = 0.5
-# T = 10
-# tau = 0.5
-
-
-print(tr_s[0])
-print(test_l)
-print(len(labels), sum(labels))
-
-
+plt.show()
