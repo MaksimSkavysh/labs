@@ -47,7 +47,7 @@ def grad_finite_diff(func, x, eps=1e-8):
 # logistic_grad(w, X, y)
 
 mat_grad = logistic_grad(w, X, y)
-num_grad = grad_finite_diff(lambda w: logistic(w, X, y), w)
+num_grad = grad_finite_diff(lambda x: logistic(x, X, y), w)
 
 for i in range(0, 5):
     print(mat_grad[i]/num_grad[i])
@@ -57,4 +57,20 @@ err = max_error(mat_grad, num_grad)
 print('err = ', err, 'ok' if err < 1e-6 else 'ошибка очень большая!')
 
 
-print('asd')
+def logistic_hess(w, X, y):
+    """
+        logistic_hess(w, X, y) вычисляет гессиан функции качества лог регрессии dL(w, X, y)/dw
+
+        w: np.array размера (M,)
+        X: np.array размера (N, M)
+        y: np.array размера (M,)
+
+        hessw: np.array размера (M, M)
+    """
+    # hessw = # Гессиан dL/dw_iw_j
+    # YOUR CODE HERE
+    raise NotImplementedError()
+
+assert(logistic_hess(w, X, y).shape == (w.shape[0], w.shape[0]))
+
+print('\n')

@@ -14,9 +14,9 @@ class BoundedMeta(type):
         return obj
 
 
-# class C(metaclass=BoundedMeta, max_instance_count=2):
-#     pass
-#
+class C(metaclass=BoundedMeta, max_instance_count=2):
+    pass
+
 # c1 = C()
 # c2 = C()
 #
